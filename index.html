@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Expense Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{--purple:#7041c5;--purple2:#8b5cf6;--pink:#f276b8;--yellow:#f7cb49;--cyan:#55c8dc;--ink:#241b35;--muted:#827b8d;--line:#eeeaf3;--bg:#f8f7fb;--white:#fff;--green:#239b76;--red:#dc6478}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:1440px;margin:auto;min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{background:#fff;border-right:1px solid var(--line);padding:28px 18px;display:flex;flex-direction:column;gap:30px}.brand{display:flex;align-items:center;gap:11px;padding:0 9px}.brandmark{width:38px;height:38px;border-radius:13px;background:var(--purple);color:#fff;display:grid;place-items:center;font:800 19px Manrope;box-shadow:0 7px 16px #7041c533}.brand strong{font:800 15px Manrope;display:block}.brand small{color:var(--muted);font-size:11px}.project-switcher{position:relative;margin-top:-12px}.project-toggle{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #eee7f6;background:linear-gradient(135deg,#fbf9ff,#fff);padding:12px;border-radius:14px;color:var(--ink);box-shadow:0 3px 12px #36204b08}.project-toggle:hover{border-color:#d9c9ef;background:#faf7ff}.project-symbol{width:32px;height:32px;border-radius:10px;background:#f0e9fb;color:var(--purple);display:grid;place-items:center;font-size:15px;flex:none}.project-toggle-copy{min-width:0;flex:1}.project-toggle-copy small{display:block;color:#9a91a4;font-size:9px;font-weight:800;letter-spacing:1px;margin-bottom:3px}.project-toggle-copy strong{display:block;font:700 12px Manrope;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-chevron{color:#8c8298;font-size:13px}.project-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:8;background:#fff;border:1px solid #ece6f2;border-radius:14px;padding:7px;box-shadow:0 16px 40px #241b3520;max-height:300px;overflow:auto}.project-menu.open{display:block}.project-option{width:100%;display:flex;align-items:center;gap:9px;border:0;background:transparent;text-align:left;padding:10px;border-radius:9px;color:#554b62;font-size:12px}.project-option:hover,.project-option.current{background:#f4effb;color:var(--purple)}.project-option .check{margin-left:auto;font-weight:800}.project-menu-divider{height:1px;background:#f0edf3;margin:6px 3px}.project-create{width:100%;border:0;background:#7041c5;color:white;border-radius:10px;padding:11px;font-size:12px;font-weight:700;text-align:left}.project-create:hover{background:#6034b3}.navlabel{font-size:10px;letter-spacing:1.4px;color:#aaa2b3;font-weight:700;padding:0 12px;margin-bottom:9px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#766d81;text-align:left;padding:12px;border-radius:11px;font-weight:600;display:flex;align-items:center;gap:12px}.nav button.active,.nav button:hover{background:#f1ebfb;color:var(--purple)}.nav .ico{width:19px;text-align:center;font-size:17px}.sidebottom{margin-top:auto;background:#faf7ff;border:1px solid #eee5fb;border-radius:15px;padding:14px;font-size:12px;color:#776c87;line-height:1.5}.sidebottom b{color:var(--purple)}main{padding:32px 38px 60px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:27px}.eyebrow{color:var(--purple);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.top h1{font:800 27px Manrope;margin:5px 0 0;letter-spacing:-.8px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:10px;align-items:center}.btn{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;font-weight:700;color:#5e566b;font-size:12px}.btn.primary{background:var(--purple);color:#fff;border-color:var(--purple);box-shadow:0 5px 13px #7041c52b}.btn.primary:hover{background:#6034b3}.btn:hover{transform:translateY(-1px)}.content{display:none}.content.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 19px;position:relative;overflow:hidden}.stat .label{font-size:12px;color:var(--muted);font-weight:600}.stat .value{font:800 25px Manrope;margin-top:9px;letter-spacing:-.7px}.stat .sub{font-size:11px;color:var(--muted);margin-top:7px}.stat .bubble{position:absolute;right:16px;top:17px;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:16px}.purple{background:#f1eafd;color:var(--purple)}.pink{background:#fff0f7;color:var(--pink)}.yellow{background:#fff8df;color:#b68a13}.cyan{background:#e9f9fc;color:#2698aa}.dashboardgrid{display:grid;grid-template-columns:1.35fr 1fr;gap:15px;margin-bottom:16px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;min-width:0}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.panel h3{font:800 14px Manrope;margin:0}.muted{font-size:11px;color:var(--muted)}.budgetrow{display:flex;justify-content:space-between;align-items:end;margin:5px 0 12px}.budgetrow strong{font:800 22px Manrope}.progress{height:9px;background:#f0edf4;border-radius:10px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:10px;width:0}.budgetfoot{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted);font-size:11px}.chartwrap{height:190px;position:relative}.chartwrap canvas{width:100%;height:100%}.legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:10px}.legend span{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.lowergrid{display:grid;grid-template-columns:1.4fr 1fr;gap:15px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th{text-align:left;color:#9a92a3;font-size:10px;letter-spacing:.7px;text-transform:uppercase;padding:11px 9px;border-bottom:1px solid var(--line)}td{padding:13px 9px;border-bottom:1px solid #f3f0f5;font-size:12px}tr:last-child td{border-bottom:0}.amount{font-weight:800}.pill{display:inline-flex;padding:5px 8px;border-radius:7px;background:#f3eff9;color:var(--purple);font-size:10px;font-weight:700}.avatar{width:26px;height:26px;border-radius:9px;background:#f4eafa;color:var(--purple);display:inline-grid;place-items:center;font-size:10px;font-weight:800;margin-right:7px}.empty{text-align:center;padding:35px 15px;color:var(--muted);font-size:12px}.pagehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}.field,select,textarea{border:1px solid #e9e4ef;background:#fff;border-radius:9px;padding:10px 11px;color:var(--ink);outline:none;font-size:12px;min-width:0}.field:focus,select:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px #7041c51a}.filters input{min-width:200px;flex:1}.tablepanel{padding:8px 18px 15px}.actions-cell button{border:0;background:#f5f1fa;color:var(--purple);padding:6px 8px;border-radius:7px;margin-right:4px;font-size:11px}.modalback{position:fixed;inset:0;background:#21152f66;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modalback.show{display:flex}.modal{background:#fff;width:min(650px,100%);max-height:92vh;overflow:auto;border-radius:19px;padding:24px;box-shadow:0 25px 80px #21152f33}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modalhead h2{font:800 19px Manrope;margin:0}.close{border:0;background:#f5f2f8;border-radius:9px;width:32px;height:32px;font-size:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.formgroup{display:grid;gap:6px}.formgroup.full{grid-column:1/-1}.formgroup label{font-size:11px;font-weight:700;color:#665d70}.formgroup input,.formgroup select,.formgroup textarea{width:100%}.upload{border:1.5px dashed #d9cbe9;border-radius:12px;padding:16px;text-align:center;background:#fbf9fe;color:#786b8a;font-size:11px}.upload input{margin-top:8px;font-size:11px}.previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.previews img{width:65px;height:65px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.modalfoot{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.toast{position:fixed;bottom:22px;right:22px;background:#241b35;color:white;padding:12px 17px;border-radius:11px;font-size:12px;box-shadow:0 8px 25px #0002;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:20}.toast.show{opacity:1;transform:translateY(0)}.settingsgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.personrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.personrow:last-child{border:0}.personrow button{border:0;color:var(--red);background:#fff0f2;border-radius:7px;padding:5px 8px;font-size:10px}.inlineform{display:flex;gap:8px;margin-top:13px}.inlineform input{flex:1}.hint{font-size:11px;color:var(--muted);line-height:1.5}.receiptthumb{width:35px;height:35px;object-fit:cover;border-radius:6px;vertical-align:middle;cursor:pointer}.reportcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.reportbox{background:#fbf9fe;border-radius:12px;padding:15px}.reportbox small{color:var(--muted);font-size:10px}.reportbox strong{display:block;font:800 19px Manrope;margin-top:7px}
+@media(max-width:950px){.app{grid-template-columns:1fr}.sidebar{position:sticky;top:0;z-index:5;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line);gap:12px}.brand{display:none}.project-switcher{max-width:280px;margin:0}.project-menu{top:calc(100% + 6px)}.navlabel,.sidebottom{display:none}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;padding:10px}.nav button .ico{display:none}main{padding:23px 18px 45px}.cards{grid-template-columns:repeat(2,1fr)}.dashboardgrid,.lowergrid{grid-template-columns:1fr}}@media(max-width:560px){.top{align-items:flex-start;flex-direction:column}.top h1{font-size:23px}.actions{width:100%;flex-wrap:wrap}.actions .btn{flex:1}.actions select{flex:1;max-width:none!important}.cards{gap:9px}.stat{padding:14px}.stat .value{font-size:20px}.stat .bubble{width:28px;height:28px;right:10px;top:12px}.formgrid,.settingsgrid{grid-template-columns:1fr}.formgroup.full{grid-column:auto}.reportcards{grid-template-columns:1fr}.panel{padding:15px}.pagehead{align-items:flex-start;flex-direction:column}}
+
+/* Mobile layout refinements */
+html, body { width:100%; max-width:100%; overflow-x:hidden; }
+.app, main, .sidebar, .content, .panel, .dashboardgrid, .lowergrid,
+.cards, .stat, .tablewrap { min-width:0; }
+@media (max-width:950px) {
+  .sidebar { position:relative; width:100%; overflow:visible; }
+  .project-switcher { width:100%; max-width:none; }
+  .project-toggle { width:100%; }
+  .project-menu { width:100%; max-height:min(55vh,360px); }
+  .nav { width:100%; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain;
+         scrollbar-width:thin; padding-bottom:2px; }
+  .nav button { flex:0 0 auto; }
+  main { width:100%; max-width:100%; padding:20px 14px 40px; overflow:hidden; }
+  .cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .dashboardgrid, .lowergrid { grid-template-columns:minmax(0,1fr); }
+}
+@media (max-width:560px) {
+  .top { width:100%; }
+  .actions { display:grid; grid-template-columns:1fr 1fr; width:100%; }
+  .actions .btn { min-width:0; width:100%; white-space:normal; }
+  .cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .stat { min-width:0; padding:12px; }
+  .stat .label, .stat .sub { overflow-wrap:anywhere; }
+  .stat .value { font-size:clamp(17px,5vw,20px); overflow-wrap:anywhere; }
+  .stat .bubble { width:25px; height:25px; right:8px; top:9px; }
+  .panel { width:100%; min-width:0; padding:13px; }
+  .panelhead { min-width:0; flex-wrap:wrap; }
+  .chartwrap { width:100%; min-width:0; }
+  .filters { display:grid; grid-template-columns:1fr 1fr; }
+  .filters input { grid-column:1/-1; min-width:0; width:100%; }
+  .filters select { min-width:0; width:100%; }
+  .formgrid, .settingsgrid { grid-template-columns:minmax(0,1fr); }
+  .formgroup.full { grid-column:auto; }
+  .inlineform { flex-wrap:wrap; }
+  .inlineform input { min-width:0; width:100%; }
+  .inlineform button { flex:1; }
+  .modalback { padding:10px; align-items:flex-end; }
+  .modal { width:100%; max-height:92dvh; border-radius:18px 18px 12px 12px; padding:18px; }
+  .tablewrap { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+}
+
+</style></head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div class="brandmark">P</div><div><strong>Production Tracker</strong><small>CREW EXPENSES</small></div></div>
+ <div class="project-switcher" id="projectSwitcherWrap">
+  <button class="project-toggle" id="projectToggle" aria-expanded="false" aria-label="Switch project">
+   <span class="project-symbol">▦</span><span class="project-toggle-copy"><small>ACTIVE PROJECT</small><strong id="activeProjectLabel">My Production Project</strong></span><span class="project-chevron">⌄</span>
+  </button>
+  <div class="project-menu" id="projectMenu"><div id="projectOptions"></div><div class="project-menu-divider"></div><button class="project-create" id="newProjectBtn">＋ &nbsp; Create a new project</button></div>
+ </div>
+ <div><div class="navlabel">WORKSPACE</div><nav class="nav">
+ <button class="active" data-page="dashboard"><span class="ico">▦</span>Overview</button>
+ <button data-page="expenses"><span class="ico">↗</span>Expenses</button>
+ <button data-page="analytics"><span class="ico">◒</span>Analytics</button>
+ <button data-page="team"><span class="ico">♙</span>Contributors</button>
+ <button data-page="settings"><span class="ico">⚙</span>Project settings</button>
+ </nav></div>
+ <div class="sidebottom"><b>Local workspace</b><br>Your data stays in this browser. Export a backup regularly to keep a safe copy.</div>
+</aside>
+<main>
+<header class="top"><div><div class="eyebrow" id="projectEyebrow">PRODUCTION WORKSPACE</div><h1 id="pageTitle">Good work starts with clarity.</h1><p id="pageSub">Here's how your production spending is looking.</p></div><div class="actions"><button class="btn" id="exportBtn">↓ Export CSV</button><button class="btn primary" id="addBtn">＋ Add expense</button></div></header>
+<section class="content active" id="dashboard">
+ <div class="cards">
+  <div class="stat"><div class="label">Project budget</div><div class="value" id="sBudget">₹0</div><div class="sub">Your planned production spend</div><div class="bubble purple">◎</div></div>
+  <div class="stat"><div class="label">Total expenses</div><div class="value" id="sSpent">₹0</div><div class="sub" id="sCount">0 recorded transactions</div><div class="bubble pink">↗</div></div>
+  <div class="stat"><div class="label">Budget remaining</div><div class="value" id="sRemaining">₹0</div><div class="sub" id="sRemainingSub">Available to spend</div><div class="bubble yellow">◷</div></div>
+  <div class="stat"><div class="label">Contributors</div><div class="value" id="sPeople">0</div><div class="sub">People who logged expenses</div><div class="bubble cyan">♙</div></div>
+ </div>
+ <div class="dashboardgrid">
+  <div class="panel"><div class="panelhead"><h3>Budget utilisation</h3><span class="muted" id="budgetPercent">0% used</span></div><div class="budgetrow"><div><div class="muted">Total spent so far</div><strong id="spentLarge">₹0</strong></div><div class="muted" id="budgetSmall">of ₹0</div></div><div class="progress"><span id="budgetBar"></span></div><div class="budgetfoot"><span id="remainingFoot">₹0 remaining</span><span id="overBudget"></span></div></div>
+  <div class="panel"><div class="panelhead"><h3>Spend by category</h3><span class="muted">All time</span></div><div class="chartwrap"><canvas id="donut"></canvas></div><div class="legend" id="categoryLegend"></div></div>
+ </div>
+ <div class="lowergrid">
+  <div class="panel"><div class="panelhead"><h3>Recent expenses</h3><button class="btn" data-goto="expenses">View all →</button></div><div class="tablewrap" id="recentTable"></div></div>
+  <div class="panel"><div class="panelhead"><h3>Spending trend</h3><span class="muted">Last 7 days</span></div><div class="chartwrap"><canvas id="trend"></canvas></div></div>
+ </div>
+</section>
+<section class="content" id="expenses">
+ <div class="pagehead"><div><h2 style="font:800 18px Manrope;margin:0">All expenses</h2><div class="muted" style="margin-top:5px">Every production cost, all in one place.</div></div></div>
+ <div class="filters"><input class="field" id="searchExpense" placeholder="Search expenses, notes or contributor…"><select id="filterCategory"><option value="">All categories</option></select><select id="filterPerson"><option value="">All contributors</option></select><select id="filterBill"><option value="">All receipts</option><option value="yes">With bill</option><option value="no">Missing bill</option></select></div>
+ <div class="panel tablepanel"><div class="tablewrap" id="allTable"></div></div>
+</section>
+<section class="content" id="analytics">
+ <div class="cards">
+  <div class="stat"><div class="label">Average expense</div><div class="value" id="avgExpense">₹0</div><div class="sub">Per transaction</div><div class="bubble purple">∿</div></div>
+  <div class="stat"><div class="label">Largest expense</div><div class="value" id="largestExpense">₹0</div><div class="sub" id="largestName">No expenses yet</div><div class="bubble pink">↗</div></div>
+  <div class="stat"><div class="label">Receipt coverage</div><div class="value" id="receiptRate">0%</div><div class="sub">Expenses with a bill attached</div><div class="bubble yellow">▤</div></div>
+  <div class="stat"><div class="label">People reimbursed</div><div class="value" id="peopleCount">0</div><div class="sub">Contributors with expenses</div><div class="bubble cyan">♙</div></div>
+ </div>
+ <div class="dashboardgrid"><div class="panel"><div class="panelhead"><h3>Category breakdown</h3><span class="muted">Amount spent</span></div><div id="categoryBreakdown"></div></div><div class="panel"><div class="panelhead"><h3>Contributor breakdown</h3><span class="muted">Amount paid</span></div><div id="peopleBreakdown"></div></div></div>
+ <div class="panel"><div class="panelhead"><h3>Daily expense activity</h3><span class="muted">Last 14 days</span></div><div class="chartwrap" style="height:230px"><canvas id="trend14"></canvas></div></div>
+</section>
+<section class="content" id="team">
+ <div class="pagehead"><div><h2 style="font:800 18px Manrope;margin:0">Contributors</h2><div class="muted" style="margin-top:5px">Manage the people who are part of this production.</div></div></div>
+ <div class="panel" style="max-width:700px"><div class="panelhead"><h3>Team members</h3><span class="muted" id="teamTotal">0 people</span></div><div id="peopleList"></div><div class="inlineform"><input class="field" id="newPerson" placeholder="Add contributor name"><button class="btn primary" id="addPerson">Add person</button></div><p class="hint">Contributors are selectable when logging a new expense. Removing a person won't delete their existing expense records.</p></div>
+</section>
+<section class="content" id="settings">
+ <div class="settingsgrid">
+  <div class="panel"><div class="panelhead"><h3>Project details</h3></div><div class="formgroup"><label>Project name</label><input class="field" id="projectName" placeholder="e.g. Brand film shoot"></div><div class="formgroup" style="margin-top:13px"><label>Project budget (₹)</label><input class="field" id="projectBudget" type="number" min="0" placeholder="50000"></div><button class="btn primary" id="saveSettings" style="margin-top:15px">Save project details</button></div>
+  <div class="panel"><div class="panelhead"><h3>Data & backup</h3></div><p class="hint">Your project data and compressed receipt images are stored in this browser using local storage. They are not uploaded to a server.</p><button class="btn" id="backupBtn">↓ Download full backup</button> <label class="btn" style="display:inline-block">↑ Restore backup<input type="file" id="restoreFile" accept="application/json" hidden></label><p class="hint" style="margin-top:13px">Use a backup to move your data to another browser or device. This does not create live multi-device sync.</p></div>
+ </div>
+ <div class="panel" style="margin-top:15px;max-width:700px"><div class="panelhead"><h3>Expense categories</h3></div><div id="categorySettings"></div><div class="inlineform"><input class="field" id="newCategory" placeholder="Add category"><button class="btn primary" id="addCategory">Add category</button></div></div>
+</section>
+</main></div>
+<div class="modalback" id="expenseModal"><div class="modal"><div class="modalhead"><h2 id="modalTitle">Add expense</h2><button class="close" id="closeModal">×</button></div><form id="expenseForm"><div class="formgrid">
+ <div class="formgroup"><label>Expense title *</label><input class="field" id="eTitle" required placeholder="e.g. Camera rental"></div>
+ <div class="formgroup"><label>Amount (₹) *</label><input class="field" id="eAmount" required type="number" min="0.01" step="0.01" placeholder="0.00"></div>
+ <div class="formgroup"><label>Category *</label><select id="eCategory" required></select></div>
+ <div class="formgroup"><label>Paid by *</label><select id="ePerson" required></select></div>
+ <div class="formgroup"><label>Expense date *</label><input class="field" id="eDate" type="date" required></div>
+ <div class="formgroup"><label>Payment method</label><select id="ePayment"><option>UPI</option><option>Cash</option><option>Credit / Debit card</option><option>Bank transfer</option><option>Other</option></select></div>
+ <div class="formgroup full"><label>Description / notes</label><textarea id="eNotes" rows="2" placeholder="What was this expense for?"></textarea></div>
+ <div class="formgroup full"><label>Bill / receipt images (optional)</label><div class="upload">Drop your receipt images here or choose files<br><input id="eFiles" type="file" accept="image/*,.pdf" multiple><div class="previews" id="filePreviews"></div></div><div class="hint">Images are compressed before saving. Keep backups of important receipts. PDFs are recorded by filename only in this browser version.</div></div>
+ </div><div class="modalfoot"><button type="button" class="btn" id="cancelModal">Cancel</button><button class="btn primary" type="submit">Save expense</button></div></form></div></div>
+<div class="modalback" id="projectModal"><div class="modal" style="width:min(480px,100%)"><div class="modalhead"><div><div class="eyebrow">NEW WORKSPACE</div><h2 style="margin-top:5px">Create a project</h2></div><button class="close" id="closeProjectModal">×</button></div><form id="projectForm"><div class="formgroup"><label for="newProjectName">Project name *</label><input class="field" id="newProjectName" required maxlength="60" placeholder="e.g. Brand film shoot"></div><div class="formgroup" style="margin-top:14px"><label for="newProjectBudget">Initial budget (₹)</label><input class="field" id="newProjectBudget" type="number" min="0" step="100" value="50000" placeholder="50000"></div><p class="hint" style="margin-top:12px">Your new project will have its own expenses, contributors, categories and budget.</p><div class="modalfoot"><button type="button" class="btn" id="cancelProjectModal">Cancel</button><button type="submit" class="btn primary">Create project</button></div></form></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='production-expense-tracker-v1';
+const defaultState={projectName:'My Production Project',budget:50000,people:['Atharva'],categories:['Travel','Food & refreshments','Equipment','Location','Art & props','Crew','Accommodation','Post-production','Miscellaneous'],expenses:[]};
+let projects=[],activeProjectId='',state=null,editingId=null,pendingFiles=[];
+function freshProject(name='My Production Project'){return {id:crypto.randomUUID(),projectName:name,budget:50000,people:['Atharva'],categories:[...defaultState.categories],expenses:[]}}
+function loadState(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(raw && Array.isArray(raw.projects) && raw.projects.length){
+   projects=raw.projects; activeProjectId=raw.activeProjectId||projects[0].id;
+   if(!projects.some(p=>p.id===activeProjectId))activeProjectId=projects[0].id;
+  }else{
+   const legacy=raw && !Array.isArray(raw.projects)?{...defaultState,...raw}:{...defaultState};
+   legacy.id=crypto.randomUUID(); projects=[legacy]; activeProjectId=legacy.id;
+  }
+ }catch(e){const p=freshProject();projects=[p];activeProjectId=p.id}
+ return projects.find(p=>p.id===activeProjectId);
+}
+function save(){
+ const idx=projects.findIndex(p=>p.id===activeProjectId);
+ if(idx>=0)projects[idx]=state;
+ try{
+  localStorage.setItem(KEY,JSON.stringify({projects,activeProjectId}));
+  renderProjectSwitcher();
+  return true;
+ }catch(e){
+  toast('Could not save locally. Download a backup before closing this tab.');
+  return false;
+ }
+}
+function renderProjectSwitcher(){
+ const label=document.getElementById('activeProjectLabel');const options=document.getElementById('projectOptions');if(!label||!options)return;
+ label.textContent=state?.projectName||'Select a project';
+ options.innerHTML=projects.map(p=>`<button class="project-option ${p.id===activeProjectId?'current':''}" data-project-id="${esc(p.id)}"><span class="project-symbol" style="width:25px;height:25px;font-size:12px">▦</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.projectName||'Untitled project')}</span>${p.id===activeProjectId?'<span class="check">✓</span>':''}</button>`).join('');
+ options.querySelectorAll('[data-project-id]').forEach(b=>b.addEventListener('click',()=>{switchProject(b.dataset.projectId);closeProjectMenu()}));
+}
+function closeProjectMenu(){document.getElementById('projectMenu').classList.remove('open');document.getElementById('projectToggle').setAttribute('aria-expanded','false')}
+function switchProject(id){
+ const next=projects.find(p=>p.id===id);if(!next)return;
+ activeProjectId=id;state=next;editingId=null;pendingFiles=[];
+ save();render();toast('Switched to '+state.projectName);
+}
+function openProjectModal(){closeProjectMenu();document.getElementById('projectForm').reset();document.getElementById('newProjectBudget').value='50000';document.getElementById('projectModal').classList.add('show');setTimeout(()=>document.getElementById('newProjectName').focus(),80)}
+function closeProjectModal(){document.getElementById('projectModal').classList.remove('show')}
+document.getElementById('projectToggle').addEventListener('click',()=>{let menu=document.getElementById('projectMenu'),open=!menu.classList.contains('open');menu.classList.toggle('open',open);document.getElementById('projectToggle').setAttribute('aria-expanded',String(open))});
+document.addEventListener('click',e=>{if(!document.getElementById('projectSwitcherWrap').contains(e.target))closeProjectMenu()});
+document.getElementById('newProjectBtn').addEventListener('click',openProjectModal);
+document.getElementById('closeProjectModal').addEventListener('click',closeProjectModal);document.getElementById('cancelProjectModal').addEventListener('click',closeProjectModal);
+document.getElementById('projectForm').addEventListener('submit',e=>{e.preventDefault();let name=document.getElementById('newProjectName').value.trim();if(!name)return;if(projects.some(p=>p.projectName.toLowerCase()===name.toLowerCase())){toast('A project with that name already exists.');return}let p=freshProject(name);p.budget=Math.max(0,Number(document.getElementById('newProjectBudget').value)||0);projects.push(p);activeProjectId=p.id;state=p;save();render();switchPage('dashboard');closeProjectModal();toast('Project created successfully')});
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(s){let t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
+function total(){return state.expenses.reduce((a,e)=>a+Number(e.amount),0)}
+function initials(n){return (n||'?').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
+function switchPage(p){document.querySelectorAll('.content').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));let titles={dashboard:['Good work starts with clarity.',"Here's how your production spending is looking."],expenses:['Expense register','Track every payment made for this production.'],analytics:['The numbers, at a glance','See where the production budget is going.'],team:['Your production crew','Keep contributor names organised.'],settings:['Project settings','Manage your budget, categories and data.']};document.getElementById('pageTitle').textContent=titles[p][0];document.getElementById('pageSub').textContent=titles[p][1];render()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>switchPage(b.dataset.goto));
+
+function render(){renderProjectSwitcher();document.getElementById('projectEyebrow').textContent=state.projectName.toUpperCase();renderSelects();renderDashboard();renderExpenses();renderAnalytics();renderTeam();renderSettings()}
+function renderSelects(){let cats=state.categories.map(c=>`<option>${esc(c)}</option>`).join('');document.getElementById('eCategory').innerHTML=cats;document.getElementById('filterCategory').innerHTML='<option value="">All categories</option>'+cats;let ppl=state.people.map(p=>`<option>${esc(p)}</option>`).join('');document.getElementById('ePerson').innerHTML=ppl;document.getElementById('filterPerson').innerHTML='<option value="">All contributors</option>'+ppl}
+function renderDashboard(){let spent=total(),budget=Number(state.budget)||0,remain=budget-spent,pct=budget?spent/budget*100:0;document.getElementById('sBudget').textContent=money(budget);document.getElementById('sSpent').textContent=money(spent);document.getElementById('sCount').textContent=state.expenses.length+' recorded transactions';document.getElementById('sRemaining').textContent=money(remain);document.getElementById('sRemaining').style.color=remain<0?'var(--red)':'var(--green)';document.getElementById('sRemainingSub').textContent=remain<0?'Over project budget':'Available to spend';document.getElementById('sPeople').textContent=new Set(state.expenses.map(e=>e.person)).size;document.getElementById('spentLarge').textContent=money(spent);document.getElementById('budgetSmall').textContent='of '+money(budget);document.getElementById('budgetPercent').textContent=pct.toFixed(1)+'% used';document.getElementById('budgetBar').style.width=Math.min(pct,100)+'%';document.getElementById('remainingFoot').textContent=money(Math.abs(remain))+(remain<0?' over budget':' remaining');document.getElementById('overBudget').textContent=remain<0?'Budget exceeded':'';
+let recent=[...state.expenses].sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created).slice(0,5);document.getElementById('recentTable').innerHTML=tableHTML(recent,false);drawDonut('donut');drawBars('trend',7)}
+function tableHTML(list,full){if(!list.length)return '<div class="empty">No expenses yet. Add your first production expense to get started.</div>';return `<table><thead><tr><th>Expense</th><th>Category</th><th>Paid by</th><th>Date</th><th>Amount</th>${full?'<th>Bill</th><th>Actions</th>':''}</tr></thead><tbody>${list.map(e=>`<tr><td><b>${esc(e.title)}</b>${e.notes?`<div class="muted">${esc(e.notes)}</div>`:''}</td><td><span class="pill">${esc(e.category)}</span></td><td><span class="avatar">${initials(e.person)}</span>${esc(e.person)}</td><td>${new Date(e.date+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td><td class="amount">${money(e.amount)}</td>${full?`<td>${e.files?.length?`<span class="pill">${e.files.length} file(s)</span>`:'<span style="color:var(--red);font-size:10px">Missing</span>'}</td><td class="actions-cell"><button onclick="editExpense('${e.id}')">Edit</button><button onclick="deleteExpense('${e.id}')">Delete</button>${e.files?.length?`<button onclick="viewFiles('${e.id}')">Bills</button>`:''}</td>`:''}</tr>`).join('')}</tbody></table>`}
+function renderExpenses(){let q=(document.getElementById('searchExpense')?.value||'').toLowerCase(),cat=document.getElementById('filterCategory')?.value||'',person=document.getElementById('filterPerson')?.value||'',bill=document.getElementById('filterBill')?.value||'';let a=[...state.expenses].filter(e=>(!q||[e.title,e.notes,e.person,e.category].join(' ').toLowerCase().includes(q))&&(!cat||e.category===cat)&&(!person||e.person===person)&&(!bill||(bill==='yes'?(e.files?.length>0):!e.files?.length))).sort((x,y)=>y.date.localeCompare(x.date));document.getElementById('allTable').innerHTML=tableHTML(a,true)}
+['searchExpense','filterCategory','filterPerson','filterBill'].forEach(id=>document.getElementById(id).addEventListener('input',renderExpenses));
+function drawDonut(id){let c=document.getElementById(id);if(!c)return;let ctx=c.getContext('2d'),dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);let sums={};state.expenses.forEach(e=>sums[e.category]=(sums[e.category]||0)+Number(e.amount));let vals=Object.entries(sums).sort((a,b)=>b[1]-a[1]),colors=['#7041c5','#f276b8','#f7cb49','#55c8dc','#239b76','#ff9b65','#9c8ad5','#8abf9e'];let totalV=vals.reduce((a,x)=>a+x[1],0);if(!totalV){ctx.fillStyle='#eeeaf3';ctx.beginPath();ctx.arc(w/2,h/2,62,0,Math.PI*2);ctx.arc(w/2,h/2,39,0,Math.PI*2,true);ctx.fill();ctx.fillStyle='#9a92a3';ctx.font='11px DM Sans';ctx.textAlign='center';ctx.fillText('No expenses',w/2,h/2+4);document.getElementById('categoryLegend').innerHTML='';return}let start=-Math.PI/2;vals.forEach((v,i)=>{let end=start+v[1]/totalV*Math.PI*2;ctx.beginPath();ctx.arc(w/2,h/2,62,start,end);ctx.arc(w/2,h/2,39,end,start,true);ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();start=end});ctx.fillStyle='#241b35';ctx.font='800 15px Manrope';ctx.textAlign='center';ctx.fillText(money(totalV),w/2,h/2+2);ctx.fillStyle='#827b8d';ctx.font='10px DM Sans';ctx.fillText('total spent',w/2,h/2+17);document.getElementById('categoryLegend').innerHTML=vals.slice(0,4).map((v,i)=>`<span><i class="dot" style="background:${colors[i%colors.length]}"></i>${esc(v[0])}</span>`).join('')}
+function drawBars(id,days){let c=document.getElementById(id);if(!c)return;let ctx=c.getContext('2d'),dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);let vals=[];for(let i=days-1;i>=0;i--){let d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);let key=d.toISOString().slice(0,10),v=state.expenses.filter(e=>e.date===key).reduce((a,e)=>a+Number(e.amount),0);vals.push({label:d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}),v})}let max=Math.max(...vals.map(x=>x.v),1),left=8,right=8,top=12,bottom=27,plotH=h-top-bottom,plotW=w-left-right;ctx.strokeStyle='#f0edf4';ctx.lineWidth=1;for(let i=0;i<3;i++){let y=top+plotH*i/2;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke()}let step=plotW/days,bw=Math.min(22,step*.55);vals.forEach((x,i)=>{let bh=x.v/max*(plotH-8),xx=left+i*step+(step-bw)/2,yy=top+plotH-bh;ctx.fillStyle='#b99ae8';ctx.beginPath();ctx.roundRect(xx,yy,bw,Math.max(2,bh),5);ctx.fill();ctx.fillStyle='#948b9e';ctx.font='9px DM Sans';ctx.textAlign='center';if(days<=7||i%2===0)ctx.fillText(x.label,xx+bw/2,h-8)})}
+function renderAnalytics(){let ex=state.expenses,spent=total(),largest=[...ex].sort((a,b)=>b.amount-a.amount)[0],withFiles=ex.filter(e=>e.files?.length).length;document.getElementById('avgExpense').textContent=money(ex.length?spent/ex.length:0);document.getElementById('largestExpense').textContent=money(largest?.amount||0);document.getElementById('largestName').textContent=largest?.title||'No expenses yet';document.getElementById('receiptRate').textContent=(ex.length?withFiles/ex.length*100:0).toFixed(0)+'%';document.getElementById('peopleCount').textContent=new Set(ex.map(e=>e.person)).size;let byCat={},byP={};ex.forEach(e=>{byCat[e.category]=(byCat[e.category]||0)+Number(e.amount);byP[e.person]=(byP[e.person]||0)+Number(e.amount)});document.getElementById('categoryBreakdown').innerHTML=breakdown(byCat,spent);document.getElementById('peopleBreakdown').innerHTML=breakdown(byP,spent);drawBars('trend14',14)}
+function breakdown(obj,total){let entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]);if(!entries.length)return '<div class="empty">No data to show yet.</div>';return entries.map(([k,v],i)=>`<div style="margin:14px 0"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:7px"><b>${esc(k)}</b><span>${money(v)} · ${total?(v/total*100).toFixed(1):0}%</span></div><div class="progress"><span style="width:${total?v/total*100:0}%;background:${['#7041c5','#f276b8','#f7cb49','#55c8dc','#239b76'][i%5]}"></span></div></div>`).join('')}
+function renderTeam(){document.getElementById('teamTotal').textContent=state.people.length+' people';document.getElementById('peopleList').innerHTML=state.people.map(p=>`<div class="personrow"><span><span class="avatar">${initials(p)}</span>${esc(p)} <span class="muted">· ${state.expenses.filter(e=>e.person===p).length} expenses · ${money(state.expenses.filter(e=>e.person===p).reduce((a,e)=>a+Number(e.amount),0))}</span></span><button onclick="removePerson('${encodeURIComponent(p)}')">Remove</button></div>`).join('')||'<div class="empty">No contributors yet.</div>'}
+function renderSettings(){document.getElementById('projectName').value=state.projectName;document.getElementById('projectBudget').value=state.budget;document.getElementById('categorySettings').innerHTML=state.categories.map(c=>`<div class="personrow"><span>${esc(c)}</span><button onclick="removeCategory('${encodeURIComponent(c)}')">Remove</button></div>`).join('')}
+function openModal(e){editingId=e?.id||null;pendingFiles=e?.files?[...e.files]:[];document.getElementById('modalTitle').textContent=e?'Edit expense':'Add expense';document.getElementById('eTitle').value=e?.title||'';document.getElementById('eAmount').value=e?.amount||'';document.getElementById('eCategory').value=e?.category||state.categories[0]||'';document.getElementById('ePerson').value=e?.person||state.people[0]||'';document.getElementById('eDate').value=e?.date||new Date().toISOString().slice(0,10);document.getElementById('ePayment').value=e?.payment||'UPI';document.getElementById('eNotes').value=e?.notes||'';document.getElementById('eFiles').value='';showPreviews();document.getElementById('expenseModal').classList.add('show')}
+function closeModal(){document.getElementById('expenseModal').classList.remove('show')}
+document.getElementById('addBtn').onclick=()=>openModal();document.getElementById('closeModal').onclick=closeModal;document.getElementById('cancelModal').onclick=closeModal;
+function showPreviews(){document.getElementById('filePreviews').innerHTML=pendingFiles.map((f,i)=>f.data?`<img src="${f.data}" title="${esc(f.name)}">`:`<span class="pill">${esc(f.name)}</span>`).join('')}
+document.getElementById('eFiles').onchange=async ev=>{for(let f of ev.target.files){if(f.type.startsWith('image/')){try{let data=await compressImage(f);pendingFiles.push({name:f.name,type:'image',data})}catch{toast('Could not read '+f.name)}}else pendingFiles.push({name:f.name,type:'file'})}showPreviews()};
+function compressImage(file){return new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>{let img=new Image();img.onload=()=>{let scale=Math.min(1,1400/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.72))};img.onerror=reject;img.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
+document.getElementById('expenseForm').onsubmit=e=>{e.preventDefault();let item={id:editingId||crypto.randomUUID(),title:document.getElementById('eTitle').value.trim(),amount:Number(document.getElementById('eAmount').value),category:document.getElementById('eCategory').value,person:document.getElementById('ePerson').value,date:document.getElementById('eDate').value,payment:document.getElementById('ePayment').value,notes:document.getElementById('eNotes').value.trim(),files:pendingFiles,created:Date.now()};if(!item.person){toast('Add a contributor first in the Contributors tab.');return}if(editingId){let i=state.expenses.findIndex(x=>x.id===editingId);if(i>=0)state.expenses[i]=item}else state.expenses.push(item);save();closeModal();render();toast(editingId?'Expense updated':'Expense added')};
+window.editExpense=id=>{let e=state.expenses.find(x=>x.id===id);if(e)openModal(e)};
+window.deleteExpense=id=>{if(confirm('Delete this expense? This cannot be undone.')){state.expenses=state.expenses.filter(e=>e.id!==id);save();render();toast('Expense deleted')}};
+window.viewFiles=id=>{let e=state.expenses.find(x=>x.id===id);if(!e)return;let imgs=e.files.filter(f=>f.data);if(imgs.length){let w=window.open();w.document.write('<title>Receipts</title><body style="font-family:sans-serif;background:#f5f2f8;padding:20px">'+imgs.map(f=>`<div style="margin:15px"><p>${esc(f.name)}</p><img style="max-width:95%;max-height:85vh" src="${f.data}"></div>`).join('')+'</body>')}else alert(e.files.map(f=>f.name).join('\n')||'No attachments')};
+window.removePerson=name=>{name=decodeURIComponent(name);if(!confirm('Remove '+name+' from the contributor list? Existing expenses will remain.'))return;state.people=state.people.filter(p=>p!==name);save();render()};
+window.removeCategory=name=>{name=decodeURIComponent(name);if(state.expenses.some(e=>e.category===name)){toast('This category is used by existing expenses.');return}state.categories=state.categories.filter(c=>c!==name);save();render()};
+document.getElementById('addPerson').onclick=()=>{let n=document.getElementById('newPerson').value.trim();if(!n)return;if(state.people.some(p=>p.toLowerCase()===n.toLowerCase()))return toast('That contributor already exists.');state.people.push(n);document.getElementById('newPerson').value='';save();render();toast('Contributor added')};
+document.getElementById('addCategory').onclick=()=>{let n=document.getElementById('newCategory').value.trim();if(!n)return;if(state.categories.some(c=>c.toLowerCase()===n.toLowerCase()))return toast('Category already exists.');state.categories.push(n);document.getElementById('newCategory').value='';save();render();toast('Category added')};
+document.getElementById('saveSettings').onclick=()=>{state.projectName=document.getElementById('projectName').value.trim()||'Production Project';state.budget=Math.max(0,Number(document.getElementById('projectBudget').value)||0);save();render();toast('Project details saved')};
+function download(name,content,type){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function csv(){let rows=[['Date','Expense','Amount INR','Category','Paid By','Payment Method','Notes','Receipt Files'],...state.expenses.map(e=>[e.date,e.title,e.amount,e.category,e.person,e.payment,e.notes,(e.files||[]).map(f=>f.name).join('; ')])];return rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\n')}
+document.getElementById('exportBtn').onclick=()=>download('production-expenses.csv','\ufeff'+csv(),'text/csv;charset=utf-8');
+document.getElementById('backupBtn').onclick=()=>download('production-tracker-backup.json',JSON.stringify({projects,activeProjectId},null,2),'application/json');
+document.getElementById('restoreFile').onchange=e=>{
+ let f=e.target.files[0]; if(!f)return;
+ let r=new FileReader();
+ r.onload=()=>{
+  try{
+   let d=JSON.parse(r.result), incoming=[];
+   if(Array.isArray(d.projects)&&d.projects.length){
+    incoming=d.projects.filter(p=>p&&p.id&&p.projectName&&Array.isArray(p.expenses)&&Array.isArray(p.people)&&Array.isArray(p.categories));
+   } else if(Array.isArray(d.expenses)&&Array.isArray(d.people)){
+    d.id=d.id||crypto.randomUUID(); incoming=[{...defaultState,...d}];
+   }
+   if(!incoming.length) throw Error('empty');
+   if(!confirm('Import these projects and keep any other projects already saved in this browser? Existing projects with the same ID will be updated.')){e.target.value='';return;}
+   const merged=new Map(projects.map(p=>[p.id,p]));
+   incoming.forEach(p=>merged.set(p.id,p));
+   projects=Array.from(merged.values());
+   const requested=d.activeProjectId;
+   activeProjectId=incoming.some(p=>p.id===requested)?requested:incoming[0].id;
+   state=projects.find(p=>p.id===activeProjectId)||projects[0];
+   save(); render(); toast('Backup imported. Existing projects were preserved.');
+  }catch(err){toast('Backup is empty or invalid. No project data was changed.');}
+  e.target.value='';
+ };
+ r.readAsText(f);
+};
+window.addEventListener('resize',()=>{if(document.getElementById('dashboard').classList.contains('active')){drawDonut('donut');drawBars('trend',7)}if(document.getElementById('analytics').classList.contains('active'))drawBars('trend14',14)});
+renderProjectSwitcher();render();
+</script></body></html>
