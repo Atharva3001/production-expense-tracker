@@ -225,7 +225,9 @@ function showAuthenticatedApp(user) {
   // Shared project synchronization will be wired in the next stage.
   if (!window.__trackerInitialized) {
     window.__trackerInitialized = true;
-    loadState();
+    // loadState() returns the active project; assign it before saving/rendering.
+    // This preserves projects already stored in this browser's localStorage.
+    state = loadState();
     save();
     renderProjectSwitcher();
     render();
