@@ -115,7 +115,7 @@ html, body { width:100%; max-width:100%; overflow-x:hidden; }
  <button data-page="team"><span class="ico">♙</span>Contributors</button>
  <button data-page="settings"><span class="ico">⚙</span>Project settings</button>
  </nav></div>
- <div class="sidebottom"><b>Account</b><br>Signed-in workspace<br><div class="user-chip"><span id="signedInEmail"></span><button type="button" id="signOutBtn">Sign out</button></div></div>
+ <div class="sidebottom"><b>Account</b><br>Signed-in workspace<br><div class="user-chip"><span id="signedInEmail"></span><button type="button" id="signOutBtn">Sign out</button><div id="cloudStatus" style="font-size:10px;color:#239b76;margin-top:5px">Connecting to cloud…</div></div></div>
 </aside>
 <main>
 <header class="top"><div><div class="eyebrow" id="projectEyebrow">PRODUCTION WORKSPACE</div><h1 id="pageTitle">Good work starts with clarity.</h1><p id="pageSub">Here's how your production spending is looking.</p></div><div class="actions"><button class="btn" id="exportBtn">↓ Export CSV</button><button class="btn primary" id="addBtn">＋ Add expense</button></div></header>
@@ -217,20 +217,25 @@ function setAuthMode(mode) {
   document.getElementById('backToLogin').hidden = mode !== 'reset';
   document.getElementById('authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
 }
-function showAuthenticatedApp(user) {
+async function showAuthenticatedApp(user) {
   authScreen.hidden = true;
   appShell.hidden = false;
   document.getElementById('signedInEmail').textContent = user.email || 'Signed in';
-  // Existing project data is still browser-local in this first authentication release.
-  // Shared project synchronization will be wired in the next stage.
-  if (!window.__trackerInitialized) {
+  if (window.__trackerInitialized || window.__cloudLoading) return;
+  window.__cloudLoading = true;
+  document.getElementById('cloudStatus').textContent = 'Loading shared projects…';
+  try {
+    await loadCloudWorkspace(user);
     window.__trackerInitialized = true;
-    // loadState() returns the active project; assign it before saving/rendering.
-    // This preserves projects already stored in this browser's localStorage.
-    state = loadState();
-    save();
     renderProjectSwitcher();
     render();
+    document.getElementById('cloudStatus').textContent = 'Synced with cloud';
+  } catch (error) {
+    console.error('Cloud workspace load failed:', error);
+    document.getElementById('cloudStatus').textContent = 'Cloud connection failed';
+    toast('Could not load shared projects: ' + (error.message || 'Please refresh.'));
+  } finally {
+    window.__cloudLoading = false;
   }
 }
 function showUnauthenticatedApp() {
@@ -296,7 +301,7 @@ authForm.addEventListener('submit', async (event) => {
 document.getElementById('signOutBtn').onclick = async () => {
   const { error } = await supabaseClient.auth.signOut();
   if (error) toast(error.message);
-  else showUnauthenticatedApp();
+  else { window.__trackerInitialized = false; currentAuthUser = null; projects = []; activeProjectId = ''; state = null; showUnauthenticatedApp(); }
 };
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
@@ -309,6 +314,92 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
   if (session?.user) showAuthenticatedApp(session.user);
   else showUnauthenticatedApp();
 })();
+
+
+let currentAuthUser = null;
+const cloudProjectOwners = new Map();
+async function loadCloudWorkspace(user) {
+  currentAuthUser = user;
+  const { data: projectRows, error: projectsError } = await supabaseClient
+    .from('projects')
+    .select('id, project_name, budget, owner_id')
+    .order('created_at', { ascending: true });
+  if (projectsError) throw projectsError;
+
+  if (!projectRows || projectRows.length === 0) {
+    // First-time account: start with an empty local workspace rather than silently
+    // creating a misleading sample project. User can create their own project.
+    projects = [];
+    activeProjectId = '';
+    state = {
+      id: crypto.randomUUID(),
+      projectName: 'My Production Project',
+      budget: 0,
+      people: ['Atharva'],
+      categories: [...defaultState.categories],
+      expenses: []
+    };
+    projects = [state];
+    activeProjectId = state.id;
+    await saveCloudProject(state, user.id);
+    return;
+  }
+
+  const ids = projectRows.map(p => p.id);
+  cloudProjectOwners.clear();
+  projectRows.forEach(p => cloudProjectOwners.set(p.id, p.owner_id));
+  const { data: workspaces, error: workspaceError } = await supabaseClient
+    .from('project_workspaces')
+    .select('project_id, data')
+    .in('project_id', ids);
+  if (workspaceError) throw workspaceError;
+
+  const workspaceById = new Map((workspaces || []).map(w => [w.project_id, w.data]));
+  projects = projectRows.map(row => {
+    const saved = workspaceById.get(row.id);
+    if (saved && typeof saved === 'object') {
+      return {
+        ...saved,
+        id: row.id,
+        projectName: row.project_name || saved.projectName,
+        budget: Number(row.budget ?? saved.budget ?? 0),
+        people: Array.isArray(saved.people) ? saved.people : [],
+        categories: Array.isArray(saved.categories) ? saved.categories : [...defaultState.categories],
+        expenses: Array.isArray(saved.expenses) ? saved.expenses : []
+      };
+    }
+    return {
+      id: row.id,
+      projectName: row.project_name,
+      budget: Number(row.budget || 0),
+      people: ['Atharva'],
+      categories: [...defaultState.categories],
+      expenses: []
+    };
+  });
+
+  const preferredId = projects.some(p => p.id === activeProjectId) ? activeProjectId : projects[0].id;
+  activeProjectId = preferredId;
+  state = projects.find(p => p.id === activeProjectId);
+  // If an accessible project has no workspace row yet, seed it once.
+  if (!workspaceById.has(activeProjectId)) await saveCloudProject(state, user.id);
+}
+async function saveCloudProject(snapshot, userId) {
+  const { error: projectError } = await supabaseClient.from('projects').upsert({
+    id: snapshot.id,
+    project_name: snapshot.projectName,
+    budget: Number(snapshot.budget || 0),
+    owner_id: userId
+  }, { onConflict: 'id' });
+  if (projectError) throw projectError;
+  cloudProjectOwners.set(snapshot.id, userId);
+  const { error: workspaceError } = await supabaseClient.from('project_workspaces').upsert({
+    project_id: snapshot.id,
+    data: snapshot,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'project_id' });
+  if (workspaceError) throw workspaceError;
+}
 
 const KEY='production-expense-tracker-v1';
 const defaultState={projectName:'My Production Project',budget:50000,people:['Atharva'],categories:['Travel','Food & refreshments','Equipment','Location','Art & props','Crew','Accommodation','Post-production','Miscellaneous'],expenses:[]};
@@ -327,17 +418,47 @@ function loadState(){
  }catch(e){const p=freshProject();projects=[p];activeProjectId=p.id}
  return projects.find(p=>p.id===activeProjectId);
 }
+let cloudSaveQueue = Promise.resolve();
 function save(){
  const idx=projects.findIndex(p=>p.id===activeProjectId);
- if(idx>=0)projects[idx]=state;
+ if(idx>=0 && state)projects[idx]=state;
  try{
+  // Keep a browser backup as a recovery copy; Supabase is the shared source of truth.
   localStorage.setItem(KEY,JSON.stringify({projects,activeProjectId}));
-  renderProjectSwitcher();
-  return true;
  }catch(e){
-  toast('Could not save locally. Download a backup before closing this tab.');
-  return false;
+  toast('Browser backup could not be updated. Cloud save will still be attempted.');
  }
+ renderProjectSwitcher();
+ if (!window.__trackerInitialized || !currentAuthUser || !state) return true;
+ const snapshot = JSON.parse(JSON.stringify(state));
+ const userId = currentAuthUser.id;
+ cloudSaveQueue = cloudSaveQueue.then(async () => {
+   const projectRow = projects.find(p => p.id === snapshot.id);
+   const isKnownOwner = cloudProjectOwners.get(snapshot.id) === userId;
+   if (!cloudProjectOwners.has(snapshot.id) || isKnownOwner) {
+     const { error: projectError } = await supabaseClient.from('projects').upsert({
+       id: snapshot.id,
+       project_name: snapshot.projectName,
+       budget: Number(snapshot.budget || 0),
+       owner_id: userId
+     }, { onConflict: 'id' });
+     if (projectError) throw projectError;
+   }
+   const { error: workspaceError } = await supabaseClient.from('project_workspaces').upsert({
+     project_id: snapshot.id,
+     data: snapshot,
+     updated_at: new Date().toISOString()
+   }, { onConflict: 'project_id' });
+   if (workspaceError) throw workspaceError;
+   const status = document.getElementById('cloudStatus');
+   if (status) status.textContent = 'Synced with cloud';
+ }).catch(error => {
+   console.error('Cloud save failed:', error);
+   const status = document.getElementById('cloudStatus');
+   if (status) status.textContent = 'Cloud save failed';
+   toast('Cloud save failed: ' + (error.message || 'Check your connection.'));
+ });
+ return true;
 }
 function renderProjectSwitcher(){
  const label=document.getElementById('activeProjectLabel');const options=document.getElementById('projectOptions');if(!label||!options)return;
